@@ -1,4 +1,4 @@
-#!/home/penascalf5/Escritorio/Postales-SomosF5/postales-back/venv/bin/python3
+#!/home/penascalf5/Escritorio/pedagogico/postales-back/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
