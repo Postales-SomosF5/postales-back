@@ -2,6 +2,7 @@ from flask import Flask, jsonify  # ← agrega jsonify si no lo tienes
 from flask_cors import CORS
 from dotenv import load_dotenv
 from app.routes.auth_routes import auth_bp
+from app.routes.user_routes import user_bp
 from app.extensions import db, bcrypt
 import os
 
@@ -19,6 +20,8 @@ def create_app():
     bcrypt.init_app(app)
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    
+    app.register_blueprint(user_bp, url_prefix='/api/users')    
 
     # Ruta de prueba en la raíz
     @app.route('/')
