@@ -8,6 +8,8 @@ from app.routes.sector_routes import sector_bp
 from app.routes.interes_routes import intereses_bp
 from .extensions import db, bcrypt 
 import os
+from flask_jwt_extended import JWTManager
+from config import JWT_CONFIG, SECURITY_HEADERS, DB_CONFIG
 
 
 def create_app():
@@ -17,7 +19,7 @@ def create_app():
 
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY') or "secreto"
+    # app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY') or "secreto"
 
     db.init_app(app)
     bcrypt.init_app(app)
@@ -30,10 +32,24 @@ def create_app():
     
     app.register_blueprint(intereses_bp, url_prefix='/api')    
 
+     # Configuración de JWT
+    app.config['JWT_SECRET_KEY'] = JWT_CONFIG['JWT_SECRET_KEY']
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = JWT_CONFIG['JWT_ACCESS_TOKEN_EXPIRES']
+    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = JWT_CONFIG['JWT_REFRESH_TOKEN_EXPIRES']
+    
+    # Inicializar extensiones
+    jwt = JWTManager(app)
 
     # Ruta de prueba en la raíz
     @app.route('/')
     def index():
         return jsonify({"mensaje": "Bienvenidx a la API de Chamberos wuwhuho"}), 200
+    
+    # Manejo de errores
+    @app.after_request
+    def add_security_headers(response):
+        for header, value in SECURITY_HEADERS.items():
+            response.headers[header] = value
+        return response
 
     return app

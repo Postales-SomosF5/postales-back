@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.extensions import db, bcrypt
 from app.models.user import Usuario
 from datetime import datetime
+from flask_jwt_extended import create_access_token
 
 auth_bp = Blueprint('auth', __name__) 
 
@@ -57,5 +58,12 @@ def login():
     if not usuario or not usuario.check_password(data['contrasena']):
         return jsonify({"error": "Credenciales inválidas"}), 401
 
-    # Aquí luego se añadirá el JWT - Lo del TOKEN
-    return jsonify({"mensaje": "Login exitoso", "usuario_id": usuario.id}), 200
+     # Generar token JWT
+    access_token = create_access_token(identity=usuario.id)
+
+
+    return jsonify({
+        "mensaje": "Login exitoso", 
+        "usuario_id": usuario.id, 
+        "access_token": access_token
+    }), 200
