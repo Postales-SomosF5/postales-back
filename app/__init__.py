@@ -6,6 +6,7 @@ from app.routes.user_routes import user_bp
 from app.routes.centro_routes import centros_bp
 from app.routes.sector_routes import sector_bp
 from app.routes.interes_routes import intereses_bp
+from app.routes.emparejamiento_routes import emparejamientos_bp
 from .extensions import db, bcrypt 
 import os
 
@@ -29,7 +30,8 @@ def create_app():
     app.register_blueprint(sector_bp, url_prefix='/api')    
     
     app.register_blueprint(intereses_bp, url_prefix='/api')    
-
+    
+    app.register_blueprint(emparejamientos_bp, url_prefix='/api')    
 
     # Ruta de prueba en la raíz
     @app.route('/')

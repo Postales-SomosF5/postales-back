@@ -1,4 +1,3 @@
-# app/routes/user_routes.py
 from flask import Blueprint, request, jsonify
 from app.models.user import Usuario
 from app.extensions import db
