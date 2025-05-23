@@ -1,112 +1,136 @@
-# Importamos las librerías necesarias
 from flask import Flask, jsonify, request
-import mysql.connector  # Para conectar con MySQL
-import jwt               # Para generar y verificar tokens JWT
-import datetime          # Para establecer la expiración del token
-from functools import wraps  # Para decoradores personalizados
-from config import db_config   # Configuración de la base de datos
-from dotenv import load_dotenv  # Para cargar variables desde .env
-from datetime import datetime, timezone  # Añadir timezone a los imports
+import mysql.connector
+import jwt
+import datetime
+from functools import wraps
+from config import DB_CONFIG
+from dotenv import load_dotenv
 import os
+import bcrypt
+from flask_cors import CORS
 
-# Cargar variables de entorno desde el archivo .env
+# Cargar variables de entorno desde .env
 load_dotenv()
 
-# Creamos la aplicación Flask
+# Crear aplicación Flask
 app = Flask(__name__)
-
-# Configuramos una clave secreta que se usará para firmar los tokens JWT.
-# Esta clave debe ser segura y única. En producción, no debe estar en el código.
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback_secret_key')
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
-# === DECORADOR: Requiere token válido para acceder a rutas protegidas ===
+# === DECORADORES DE ACCESO SEGÚN ROL ===
+
+def login_required(f):
+    """
+    Requiere que el usuario tenga sesión iniciada.
+    El token debe estar presente y válido.
+    """
+
+    return token_required(f) 
+
+def admin_required(f):
+    """
+    Requiere que el usuario sea 'admin' o 'super_admin'.
+    """
+    @wraps(f)
+    def decorated(current_user, *args, **kwargs):
+        if current_user['rol'] not in ['admin', 'super_admin']:
+            return jsonify({'mensaje': 'Acceso denegado: se requiere rol de administrador'}), 403
+        return f(current_user, *args, **kwargs)
+    return token_required(decorated)
+
+def super_admin_required(f):
+    """
+    Requiere que el usuario sea 'super_admin'.
+    """
+    @wraps(f)
+    def decorated(current_user, *args, **kwargs):
+        if current_user['rol'] != 'super_admin':
+            return jsonify({'mensaje': 'Acceso denegado: se requiere rol de super administrador'}), 403
+        return f(current_user, *args, **kwargs)
+    return token_required(decorated)
+
+
+# === FUNCIONES AUXILIARES ===
+
 def token_required(f):
     """
-    Este es un decorador que protege las rutas que lo usan.
-    Solo permite ejecutar la función si se envía un token válido en el encabezado.
+    Verifica que el token JWT esté presente y sea válido.
+    Si es válido, extrae la información del usuario y su rol.
     """
     @wraps(f)
     def decorated(*args, **kwargs):
-        # Buscamos el token en el encabezado "x-access-token"
         token = request.headers.get('x-access-token')
-
         if not token:
             return jsonify({'mensaje': 'Token faltante'}), 401
-
         try:
-            # Decodificamos el token usando la clave secreta
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-            current_user = data['user']  # Extraemos el usuario del token
+            current_user = {
+                'email': data['user'],
+                'rol': data.get('rol', 'usuario')  # Si no hay rol, asume 'usuario'
+            }
         except Exception as e:
-            print("Error al decodificar el token:", str(e))
+            print("Error al decodificar token:", str(e))
             return jsonify({'mensaje': 'Token inválido'}), 401
-
-        # Si todo está bien, pasamos el usuario autenticado a la función original
         return f(current_user, *args, **kwargs)
-
     return decorated
 
 
-# === FUNCIÓN AUXILIAR: Conectar a la base de datos ===
 def get_db_connection():
     """
-    Función auxiliar para conectarse a la base de datos MySQL
-    usando la configuración definida en config.py
+    Devuelve una conexión a la base de datos MySQL.
     """
-    conn = mysql.connector.connect(**db_config)
-    return conn
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        return conn
+    except mysql.connector.Error as err:
+        print(f"Error de conexión a la base de datos: {err}")
+        raise
 
+# === RUTAS ===
 
-# === RUTA: Registro de nuevo usuario ===
 @app.route('/registro', methods=['POST'])
-def registrar_usuario():
+@super_admin_required
+def registrar_usuario(current_user):
     """
-    Endpoint para registrar un nuevo usuario.
-    Recibe nombre, email y password en formato JSON.
-    Verifica si el correo ya existe y lo inserta en la base de datos.
+    Endpoint para registro de usuarios. Solo accesible por 'super_admin'.
+    Guarda contraseña como hash y asigna rol predeterminado ('usuario').
     """
-
-    # Obtenemos los datos del cuerpo de la solicitud (JSON)
     datos = request.get_json()
     nombre = datos['nombre']
     email = datos['email']
     password = datos['password']
+    rol = datos.get('rol', 'usuario')  # Por defecto: usuario normal
 
-    # Nos conectamos a la base de datos
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)  # dictionary=True devuelve resultados como diccionarios
+    cursor = conn.cursor(dictionary=True)
 
     try:
-        # Verificamos si ya existe un usuario con ese email
         cursor.execute("SELECT * FROM usuarios WHERE email = %s", (email,))
         if cursor.fetchone():
             return jsonify({'mensaje': 'El correo ya está en uso'}), 400
 
-        # Insertamos el nuevo usuario en la tabla
         cursor.execute(
-            "INSERT INTO usuarios (nombre, email, password) VALUES (%s, %s, %s)",
-            (nombre, email, password)
+            "INSERT INTO usuarios (nombre, email, password, rol) VALUES (%s, %s, %s, %s)",
+            (nombre, email, hashed_password.decode('utf-8'), rol)
         )
-        conn.commit()  # Guardamos los cambios en la base de datos
+        conn.commit()
         cursor.close()
         conn.close()
 
         return jsonify({'mensaje': 'Usuario registrado exitosamente'}), 201
 
     except Exception as e:
-        conn.rollback()  # Deshacemos cualquier cambio si hubo error
+        conn.rollback()
         return jsonify({'mensaje': 'Error al registrar usuario', 'error': str(e)}), 500
 
 
-# === RUTA: Iniciar sesión y devolver token JWT ===
 @app.route('/login', methods=['POST'])
 def login():
     """
-    Endpoint para iniciar sesión.
-    Recibe email y contraseña, verifica contra la base de datos,
-    y devuelve un token JWT si las credenciales son correctas.
+    Inicia sesión y devuelve un token JWT con rol incluido.
     """
-
     datos = request.get_json()
     email = datos['email']
     password = datos['password']
@@ -114,20 +138,16 @@ def login():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Buscamos al usuario por su email
     cursor.execute("SELECT * FROM usuarios WHERE email = %s", (email,))
     usuario = cursor.fetchone()
     cursor.close()
     conn.close()
 
-    # Comprobamos si el usuario existe y si la contraseña coincide
-    if usuario and usuario['password'] == password:
-        # Generamos un token JWT con:
-        # - El email del usuario
-        # - Fecha de expiración (30 minutos)
+    if usuario and bcrypt.checkpw(password.encode('utf-8'), usuario['password'].encode('utf-8')):
         token = jwt.encode({
             'user': usuario['email'],
-            'exp': datetime.now(timezone.utc) + datetime.timedelta(minutes=30)
+            'rol': usuario['rol'],
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
         }, app.config['SECRET_KEY'], algorithm='HS256')
 
         return jsonify({'token': token})
@@ -135,20 +155,16 @@ def login():
         return jsonify({'mensaje': 'Credenciales inválidas'}), 401
 
 
-# === RUTA: Perfil protegido con token ===
 @app.route('/perfil', methods=['GET'])
-@token_required
+@login_required
 def perfil(current_user):
     """
-    Endpoint protegido. Solo accesible con token válido.
-    Devuelve información del usuario actual desde la base de datos.
+    Muestra el perfil del usuario autenticado.
     """
-
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Buscamos al usuario por su email (guardado en el token)
-    cursor.execute("SELECT id, nombre, email FROM usuarios WHERE email = %s", (current_user,))
+    cursor.execute("SELECT id, nombre, email, rol FROM usuarios WHERE email = %s", (current_user['email'],))
     usuario = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -159,10 +175,24 @@ def perfil(current_user):
         return jsonify({'mensaje': 'Usuario no encontrado'}), 404
 
 
+@app.route('/admin/dashboard', methods=['GET'])
+@admin_required
+def dashboard_admin(current_user):
+    """
+    Accesible solo para admins y super_admins.
+    """
+    return jsonify({'mensaje': f'Bienvenido al panel de administración, {current_user["email"]}'})
+
+
+@app.route('/super-admin/configuraciones', methods=['GET'])
+@super_admin_required
+def configuraciones_super_admin(current_user):
+    """
+    Accesible solo para super_admin.
+    """
+    return jsonify({'mensaje': f'Configuraciones avanzadas - Acceso total, {current_user["email"]}'})
+
+
 # === INICIAR SERVIDOR ===
 if __name__ == '__main__':
-    """
-    Punto de entrada del programa.
-    Ejecutamos la aplicación Flask en modo debug.
-    """
     app.run(debug=True)
