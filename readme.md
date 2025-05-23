@@ -14,3 +14,5 @@ pip install flask
 pip install flask-cors python-dotenv
 
 pip install -r requirements.txt
+
+para agregar las instalaciones: pip freeze > requirements.txt
