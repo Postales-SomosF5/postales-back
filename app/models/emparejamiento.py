@@ -21,5 +21,10 @@ class Emparejamiento(db.Model):
             "usuario_b_id": self.usuario_b_id,
             "fecha_emparejamiento": str(self.fecha_emparejamiento),
             "estado": self.estado,
-            "fecha_fin": self.fecha_fin.isoformat() if self.fecha_fin else None
+            "fecha_fin": self.fecha_fin.isoformat() if self.fecha_fin else None,
+            "usuario_a_nombre": self.usuario_a.nombre if self.usuario_a else None,
+            "usuario_a_apellido": self.usuario_a.apellido if self.usuario_a else None,
+            "usuario_b_nombre": self.usuario_b.nombre if self.usuario_b else None,
+            "usuario_b_apellido": self.usuario_b.apellido if self.usuario_b else None
+
         }
