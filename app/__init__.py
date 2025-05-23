@@ -3,7 +3,9 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from app.routes.auth_routes import auth_bp
 from app.routes.user_routes import user_bp
-# from app.extensions import db, bcrypt
+from app.routes.centro_routes import centros_bp
+from app.routes.sector_routes import sector_bp
+from app.routes.interes_routes import intereses_bp
 from .extensions import db, bcrypt 
 import os
 
@@ -22,7 +24,12 @@ def create_app():
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     
-    app.register_blueprint(user_bp, url_prefix='/api/users')    
+    app.register_blueprint(centros_bp, url_prefix='/api')    
+    
+    app.register_blueprint(sector_bp, url_prefix='/api')    
+    
+    app.register_blueprint(intereses_bp, url_prefix='/api')    
+
 
     # Ruta de prueba en la raíz
     @app.route('/')
