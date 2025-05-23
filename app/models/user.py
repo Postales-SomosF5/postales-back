@@ -1,30 +1,40 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
 from app.extensions import db, bcrypt
-
-
-db = SQLAlchemy()
-bcrypt = Bcrypt()
 
 class Usuario(db.Model):
     __tablename__ = 'usuarios'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)  # ✅ NECESARIO
-    password = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(20), default="user")
+    nombre = db.Column(db.String(100))
+    apellido = db.Column(db.String(100))
+    email = db.Column(db.String(120), unique=True, nullable=False)  
+    contrasena = db.Column(db.String(200), nullable=False)  
+    rol_id = db.Column(db.Integer)
+    centro_id = db.Column(db.Integer)
+    sector_id = db.Column(db.Integer)
+    refuerzo_linguistico = db.Column(db.Boolean)
+    penascal_rol = db.Column(db.String(100))
+    fecha_alta = db.Column(db.Date, nullable=True)
+    fecha_baja = db.Column(db.Date, nullable=True)
 
-    def set_password(self, password):
-        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    def check_password(self, password):
-        return bcrypt.check_password_hash(self.password, password)
+    def set_password(self, contrasena):
+        self.contrasena = bcrypt.generate_password_hash(contrasena).decode('utf-8')
+
+    def check_password(self, contrasena):
+        return bcrypt.check_password_hash(self.contrasena, contrasena)
 
     def to_dict(self):
         return {
             "id": self.id,
-            "username": self.username,
+            "nombre": self.nombre,
+            "apellido": self.apellido,
             "email": self.email,
-            "role": self.role
+            "rol_id": self.rol_id,
+            "centro_id": self.centro_id,
+            "sector_id": self.sector_id,
+            "refuerzo_linguistico": self.refuerzo_linguistico,
+            "penascal_rol": self.penascal_rol,
+            "fecha_alta": self.fecha_alta.isoformat() if self.fecha_alta else None,
+            "fecha_baja": self.fecha_baja.isoformat() if self.fecha_baja else None,
         }
+
