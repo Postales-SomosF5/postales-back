@@ -1,3 +1,4 @@
+from app.utils.jwt_utils import admin_required, super_admin_required
 from flask import Blueprint, jsonify, request
 from app.models.emparejamiento import Emparejamiento
 from app.models.user import Usuario
@@ -8,6 +9,7 @@ emparejamientos_bp = Blueprint('emparejamientos', __name__)
 
 # POST /api/emparejamientos
 @emparejamientos_bp.route('/emparejamientos', methods=['POST'])
+@admin_required
 def crear_emparejamiento():
     data = request.get_json()
     usuario_a_id = data.get('usuario_a_id')
@@ -45,12 +47,14 @@ def crear_emparejamiento():
 
 # GET /api/emparejamientos/lista
 @emparejamientos_bp.route('/emparejamientos/lista', methods=['GET'])
+@admin_required
 def listar_emparejamientos():
     emparejamientos = Emparejamiento.query.all()
     resultado = [emparejamiento.to_dict() for emparejamiento in emparejamientos]
     return jsonify(resultado), 200
 
 @emparejamientos_bp.route('/emparejamientos/auto', methods=['POST'])
+@super_admin_required
 def emparejamiento_automatico():
     usuarios = Usuario.query.all()
 
