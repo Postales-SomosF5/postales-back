@@ -12,6 +12,9 @@ import os
 from flask_jwt_extended import JWTManager
 from config import JWT_CONFIG, SECURITY_HEADERS, DB_CONFIG
 
+from .extensions import db, bcrypt, mail
+
+
 
 def create_app():
     load_dotenv()
@@ -21,6 +24,16 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY') or "secreto"
+
+
+    # Configuración Flask-Mail
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 25))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') == 'True'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+
 
     db.init_app(app)
     bcrypt.init_app(app)
