@@ -50,7 +50,7 @@ def listar_emparejamientos():
     resultado = [emparejamiento.to_dict() for emparejamiento in emparejamientos]
     return jsonify(resultado), 200
 
-@emparejamientos_bp.route('emparejamientos/auto', methods=['POST'])
+@emparejamientos_bp.route('/emparejamientos/auto', methods=['POST'])
 def emparejamiento_automatico():
     usuarios = Usuario.query.all()
 
