@@ -5,6 +5,9 @@ from app.models.user import Usuario
 from datetime import datetime
 from flask_jwt_extended import create_access_token
 
+from flask_mail import Message
+from app.extensions import mail
+
 auth_bp = Blueprint('auth', __name__) 
 
 @auth_bp.route('/register', methods=['POST'])

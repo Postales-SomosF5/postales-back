@@ -12,9 +12,9 @@ import os
 from flask_jwt_extended import JWTManager
 from config import JWT_CONFIG, SECURITY_HEADERS, DB_CONFIG
 
-from .extensions import db, bcrypt, mail
+from app.extensions import db, bcrypt, mail
 
-
+mail.init_app(app)
 
 def create_app():
     load_dotenv()

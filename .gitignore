@@ -14,12 +14,7 @@ __pycache__
 *.egg-info/
 
 # Ignorar archivos de variables de entorno
-.env
-.env.local
-.env.development
-.env.test
-.env.production
-.env.staging
+
 
 # Ignorar herramientas de desarrollo frontend (si aplica)
 .DS_Store
