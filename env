@@ -1,0 +1,10 @@
+
+MYSQL_HOST=192.168.21.90
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=1234
+MYSQL_DB=postales
+MAIL_USERNAME=tu-correo@gmail.com
+MAIL_PASSWORD=tu-token-o-contraseña
+JWT_SECRET_KEY=tu-clave-super-secreta
+DATABASE_URI=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DB}
