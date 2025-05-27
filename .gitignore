@@ -2,3 +2,4 @@ pycache/
 *.pyc
 *.pyo
 .env
+/venv
