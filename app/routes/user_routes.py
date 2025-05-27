@@ -79,8 +79,8 @@ def update_user(user_id):
     return jsonify(usuario.to_dict()), 200
 
 # DELETE /api/users/<id> - Eliminar un usuario
-@admin_required
 @user_bp.route('/<int:user_id>', methods=['DELETE'])
+@login_required
 def delete_user(user_id):
     usuario = Usuario.query.get(user_id)
     if not usuario:
