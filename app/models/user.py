@@ -15,6 +15,8 @@ class Usuario(db.Model):
     penascal_rol = db.Column(db.String(100))
     fecha_alta = db.Column(db.Date, nullable=True)
     fecha_baja = db.Column(db.Date, nullable=True)
+    # rol_id = db.Column(db.Integer, db.ForeignKey('roles.id'))  
+    # rol = db.relationship('Rol', backref='usuarios')
 
 
     def set_password(self, contrasena):
