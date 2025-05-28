@@ -32,6 +32,9 @@ def create_app():
     app.register_blueprint(sector_bp, url_prefix='/api')    
     
     app.register_blueprint(intereses_bp, url_prefix='/api')    
+    
+    app.register_blueprint(user_bp, url_prefix='/api/usuarios')    
+
 
      # Configuración de JWT
     app.config['JWT_SECRET_KEY'] = JWT_CONFIG['JWT_SECRET_KEY']
