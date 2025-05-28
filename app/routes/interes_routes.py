@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from app.models.interes import Interes
-from app.utils.jwt_utils import login_required, admin_required, super_admin_required
+from app.utils.jwt_utils import admin_required
 
 intereses_bp = Blueprint('intereses', __name__)
 

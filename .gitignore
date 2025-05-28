@@ -1,33 +1,5 @@
-# Ignorar entorno virtual de Python
-venv/
-__pycache__
+pycache/
 *.pyc
 *.pyo
-*.db
-*.log
-*.pot
-*.sqlite
-*.pid
-
-# Ignorar paquetes instalados
-*.dist-info/
-*.egg-info/
-
-# Ignorar archivos de variables de entorno
-
-
-# Ignorar herramientas de desarrollo frontend (si aplica)
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-node_modules/
-dist/
-build/
-*.swp
-*.swo
-
-# Archivos temporales o compilados
-*.pyc
-*.pyo
-__pycache__
+.env
+/venv
