@@ -16,13 +16,28 @@ from config import JWT_CONFIG, SECURITY_HEADERS
 def create_app():
     load_dotenv()
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
     # Configuración de base de datos
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY') or "secreto"
 
-    # Configuración de JWT
+    db.init_app(app)
+    bcrypt.init_app(app)
+
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    
+    app.register_blueprint(centros_bp, url_prefix='/api')    
+    
+    app.register_blueprint(sector_bp, url_prefix='/api')    
+    
+    app.register_blueprint(intereses_bp, url_prefix='/api')    
+    
+    app.register_blueprint(user_bp, url_prefix='/api/usuarios')    
+
+
+     # Configuración de JWT
     app.config['JWT_SECRET_KEY'] = JWT_CONFIG['JWT_SECRET_KEY']
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = JWT_CONFIG['JWT_ACCESS_TOKEN_EXPIRES']
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = JWT_CONFIG['JWT_REFRESH_TOKEN_EXPIRES']

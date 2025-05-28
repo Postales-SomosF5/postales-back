@@ -90,14 +90,17 @@ def delete_user(user_id):
     db.session.commit()
     return jsonify({"mensaje": "Usuario eliminado correctamente"}), 200
 
-@user_bp.route('/<deletel_all>', methods=['DELETE'])
+# DELETE /api/usuarios/borrar_todo - Eliminar un usuario
+@user_bp.route('/borrar_todo', methods=['DELETE'])
 @super_admin_required
-def delete_all():
-    usuarios = Usuario.query.all()
-    if not usuario:
-        return jsonify({"error": "No hay usuarios para eliminar"}), 200
+def borrar_todo():
+    usuarios_a_eliminar = Usuario.query.filter(Usuario.rol_id == 3).all()
 
-    for usuario in usuarios:
+    if not usuarios_a_eliminar:
+        return jsonify({"mensaje": "No hay usuarios para eliminar"}), 200
+
+    for usuario in usuarios_a_eliminar:
         db.session.delete(usuario)
+
     db.session.commit()
-    return jsonify({"mensaje": "Todos los usuarios han sido eliminados correctamente"}), 200
+    return jsonify({"mensaje": "Usuarios eliminados, excepto los Admins"}), 200
