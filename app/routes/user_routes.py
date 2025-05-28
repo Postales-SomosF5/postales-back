@@ -79,8 +79,8 @@ def update_user(user_id):
     return jsonify(usuario.to_dict()), 200
 
 # DELETE /api/users/<id> - Eliminar un usuario
-@admin_required
 @user_bp.route('/<int:user_id>', methods=['DELETE'])
+@login_required
 def delete_user(user_id):
     usuario = Usuario.query.get(user_id)
     if not usuario:
@@ -89,3 +89,15 @@ def delete_user(user_id):
     db.session.delete(usuario)
     db.session.commit()
     return jsonify({"mensaje": "Usuario eliminado correctamente"}), 200
+
+@user_bp.route('/<deletel_all>', methods=['DELETE'])
+@super_admin_required
+def delete_all():
+    usuarios = Usuario.query.all()
+    if not usuario:
+        return jsonify({"error": "No hay usuarios para eliminar"}), 200
+
+    for usuario in usuarios:
+        db.session.delete(usuario)
+    db.session.commit()
+    return jsonify({"mensaje": "Todos los usuarios han sido eliminados correctamente"}), 200
