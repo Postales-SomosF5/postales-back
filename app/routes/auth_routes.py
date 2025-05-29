@@ -56,7 +56,7 @@ def register():
             recipients=[nuevo_usuario.email],
             body=f"Hola {nuevo_usuario.nombre}, tu registro en la plataforma se ha realizado correctamente.\n\nGracias por unirte."
         )
-<<<<<<< HEAD
+
         mail.send(msg)
         correo_enviado = True
     except Exception as e:
@@ -67,20 +67,6 @@ def register():
         "mensaje": "Usuario registrado correctamente",
         "correo_enviado": correo_enviado
     }), 201
-
-=======
-        # mail.send(msg)
-
-        return jsonify({"mensaje": "Usuario registrado correctamente y correo enviado"}), 201
-
-    except Exception as e:
-        db.session.rollback()
-        print("ERROR REGISTRO:", str(e))  # Esto te lo mostrará en consola
-        return jsonify({
-            "error": "Error en el servidor al registrar usuario.",
-            "detalle": str(e)
-        }), 500
->>>>>>> 1a1212b (ajustes modelos roles)
 
 
 
