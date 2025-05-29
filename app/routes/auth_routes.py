@@ -56,7 +56,6 @@ def register():
             recipients=[nuevo_usuario.email],
             body=f"Hola {nuevo_usuario.nombre}, tu registro en la plataforma se ha realizado correctamente.\n\nGracias por unirte."
         )
-
         mail.send(msg)
         correo_enviado = True
     except Exception as e:

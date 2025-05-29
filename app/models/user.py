@@ -39,6 +39,22 @@ class Usuario(db.Model):
  # Relaciones
     centro = db.relationship('Centro', backref='usuarios')
     sector = db.relationship('Sector', backref='usuarios')
+    
+    # intereses = db.relationship(
+    #      'Interes',
+    #      secondary=intereses_usuarios,
+    #      back_populates='usuarios'
+    #  )
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "apellido": self.apellido,
+            "email": self.email,
+            "intereses": [interes.to_dict() for interes in self.intereses]
+        }
+>>>>>>> a37d1da (cerebro frito)
 
     def set_password(self, contrasena):
         self.contrasena = bcrypt.generate_password_hash(contrasena).decode('utf-8')
