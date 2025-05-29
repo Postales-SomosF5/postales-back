@@ -135,6 +135,16 @@ def obtener_intereses_usuario(usuario_id):
     return jsonify(intereses), 200
 
 
+@user_bp.route('/usuarios/<int:usuario_id>/intereses', methods=['GET'])
+def obtener_intereses_usuario(usuario_id):
+    usuario = Usuario.query.get(usuario_id)
+    if not usuario:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+
+    intereses = [interes.to_dict() for interes in usuario.intereses]
+    return jsonify(intereses), 200
+
+
 # PUT /api/usuarios/<int:user_id>/rol - asignar rol a usuario (sólo el superadmin)
 
 # @user_bp.route('/<int:user_id>/rol', methods=['PUT'])
