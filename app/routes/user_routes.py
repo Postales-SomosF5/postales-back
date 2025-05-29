@@ -18,7 +18,7 @@ def get_users():
 
 # GET /api/usuarios/<id> - Obtener un usuario por ID
 @user_bp.route('/<int:user_id>', methods=['GET'])
-@super_admin_required
+# @super_admin_required
 def get_user(user_id):
     usuario = Usuario.query.get(user_id)
     if not usuario:
@@ -56,7 +56,7 @@ def create_user():
     return jsonify(nuevo_usuario.to_dict()), 201
 
 # PUT /api/usuarios/<id> - Actualizar un usuario existente
-@user_bp.route('/<int:user_id>', methods=['PUT'])
+@user_bp.route('/<int:user_id>', methods=['PATCH'])
 @login_required
 def update_user(user_id):
     usuario = Usuario.query.get(user_id)
@@ -109,10 +109,20 @@ def borrar_todo():
     return jsonify({"mensaje": "Usuarios eliminados, excepto los Admins"}), 200
 
 
+@user_bp.route('/usuarios/<int:usuario_id>/intereses', methods=['GET'])
+def obtener_intereses_usuario(usuario_id):
+    usuario = Usuario.query.get(usuario_id)
+    if not usuario:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+
+    intereses = [interes.to_dict() for interes in usuario.intereses]
+    return jsonify(intereses), 200
+
+
 # PUT /api/usuarios/<int:user_id>/rol - asignar rol a usuario (sólo el superadmin)
 
 # @user_bp.route('/<int:user_id>/rol', methods=['PUT'])
-# @jwt_required()
+# @super_admin_required
 # def cambiar_rol_usuario(user_id):
 #     current_user_id = get_jwt_identity()
 #     current_user = Usuario.query.get(current_user_id)
