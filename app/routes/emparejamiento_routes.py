@@ -47,7 +47,7 @@ def crear_emparejamiento():
 
 # GET /api/emparejamientos/lista
 @emparejamientos_bp.route('/emparejamientos/lista', methods=['GET'])
-@admin_required
+# @admin_required
 def listar_emparejamientos():
     emparejamientos = Emparejamiento.query.all()
     resultado = [emparejamiento.to_dict() for emparejamiento in emparejamientos]
