@@ -39,7 +39,7 @@ def create_app():
     app.register_blueprint(intereses_bp, url_prefix='/api')  
     app.register_blueprint(emparejamientos_bp, url_prefix='/api')    
     app.register_blueprint(user_bp, url_prefix='/api/usuarios')    
-    # app.register_blueprint(rol_bp)
+    app.register_blueprint(rol_bp)
 
      # Configuración de JWT
     app.config['JWT_SECRET_KEY'] = JWT_CONFIG['JWT_SECRET_KEY']
