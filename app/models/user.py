@@ -9,8 +9,8 @@ class Usuario(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)  
     contrasena = db.Column(db.String(200), nullable=False)  
     rol_id = db.Column(db.Integer)
-    centro_id = db.Column(db.Integer)
-    sector_id = db.Column(db.Integer)
+    centro_id = db.Column(db.Integer, db.ForeignKey('centros.id'))
+    sector_id = db.Column(db.Integer, db.ForeignKey('sectores.id'))
     refuerzo_linguistico = db.Column(db.Boolean)
     penascal_rol = db.Column(db.String(100))
     fecha_alta = db.Column(db.Date, nullable=True)
@@ -18,6 +18,9 @@ class Usuario(db.Model):
     # rol_id = db.Column(db.Integer, db.ForeignKey('roles.id'))  
     # rol = db.relationship('Rol', backref='usuarios')
 
+ # Relaciones
+    centro = db.relationship('Centro', backref='usuarios')
+    sector = db.relationship('Sector', backref='usuarios')
 
     def set_password(self, contrasena):
         self.contrasena = bcrypt.generate_password_hash(contrasena).decode('utf-8')
@@ -33,7 +36,9 @@ class Usuario(db.Model):
             "email": self.email,
             "rol_id": self.rol_id,
             "centro_id": self.centro_id,
+            "centro_nombre": self.centro.nombre if self.centro else None,
             "sector_id": self.sector_id,
+            "sector_nombre": self.sector.nombre if self.sector else None,
             "refuerzo_linguistico": self.refuerzo_linguistico,
             "penascal_rol": self.penascal_rol,
             "fecha_alta": self.fecha_alta.isoformat() if self.fecha_alta else None,

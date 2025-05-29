@@ -108,6 +108,22 @@ def borrar_todo():
     db.session.commit()
     return jsonify({"mensaje": "Usuarios eliminados, excepto los Admins"}), 200
 
+@user_bp.route('/filtrar', methods=['GET'])
+def filtrar_usuarios():
+    centro_id = request.args.get('centro_id', type=int)
+    sector_id = request.args.get('sector_id', type=int)
+
+    query = Usuario.query
+
+    if centro_id:
+        query = query.filter_by(centro_id=centro_id)
+    if sector_id:
+        query = query.filter_by(sector_id=sector_id)
+
+    usuarios = query.all()
+    resultado = [u.to_dict() for u in usuarios]
+
+    return jsonify(resultado), 200
 
 # PUT /api/usuarios/<int:user_id>/rol - asignar rol a usuario (sólo el superadmin)
 
