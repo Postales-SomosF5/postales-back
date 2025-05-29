@@ -41,17 +41,7 @@ def register():
     try:
         db.session.add(nuevo_usuario)
         db.session.commit()
-
-        # Envío de correo de confirmación
-        msg = Message(
-            subject="Registro exitoso",
-            recipients=[nuevo_usuario.email],
-            body=f"Hola {nuevo_usuario.nombre}, tu registro en la plataforma se ha realizado correctamente.\n\nGracias por unirte."
-        )
-        mail.send(msg)
-
-        return jsonify({"mensaje": "Usuario registrado correctamente y correo enviado"}), 201
-
+        return jsonify({"mensaje": "Usuario registrado correctamente"}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({
@@ -71,12 +61,12 @@ def login():
     if not usuario or not usuario.check_password(data['contrasena']):
         return jsonify({"error": "Credenciales inválidas"}), 401
 
-    # Generar token JWT
+     # Generar token JWT
     access_token = create_access_token(
-        identity=str(usuario.id),
+        identity=usuario.id,
         additional_claims={
             'user': usuario.email,
-            'rol': usuario.rol_id
+            'rol': usuario.rol_id  # Asumiendo que rol_id contiene el nombre del rol
         }
     )
 

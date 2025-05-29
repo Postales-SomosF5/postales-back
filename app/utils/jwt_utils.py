@@ -19,7 +19,7 @@ def admin_required(f):
         try:
             verify_jwt_in_request()
             claims = get_jwt()
-            if claims['rol'] not in ['admin', 'super_admin']:
+            if claims['rol'] not in [2, 1]:
                 return jsonify({'mensaje': 'Acceso denegado: se requiere rol de administrador'}), 403
             return f(*args, **kwargs)
         except NoAuthorizationError:
@@ -32,7 +32,7 @@ def super_admin_required(f):
         try:
             verify_jwt_in_request()
             claims = get_jwt()
-            if claims['rol'] != 'super_admin':
+            if claims['rol'] != 1:
                 return jsonify({'mensaje': 'Acceso denegado: se requiere rol de super administrador'}), 403
             return f(*args, **kwargs)
         except NoAuthorizationError:
