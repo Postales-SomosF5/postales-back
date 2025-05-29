@@ -27,7 +27,7 @@ def create_app():
     # app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY') or "secreto"
 
     
-     # Inicializar extensiones
+    # Inicializar extensiones
     db.init_app(app)
     bcrypt.init_app(app)
     mail.init_app(app)
@@ -53,14 +53,6 @@ def create_app():
     app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
     app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
-
-    # # Registrar blueprints
-    # app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    # app.register_blueprint(user_bp, url_prefix='/api')    
-    # app.register_blueprint(centros_bp, url_prefix='/api')    
-    # app.register_blueprint(sector_bp, url_prefix='/api')    
-    # app.register_blueprint(intereses_bp, url_prefix='/api')    
-    # app.register_blueprint(emparejamientos_bp, url_prefix='/api')
 
     # Ruta de prueba en la raíz
     @app.route('/')
