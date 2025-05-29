@@ -48,16 +48,18 @@ def register():
             recipients=[nuevo_usuario.email],
             body=f"Hola {nuevo_usuario.nombre}, tu registro en la plataforma se ha realizado correctamente.\n\nGracias por unirte."
         )
-        mail.send(msg)
+        # mail.send(msg)
 
         return jsonify({"mensaje": "Usuario registrado correctamente y correo enviado"}), 201
 
     except Exception as e:
         db.session.rollback()
+        print("ERROR REGISTRO:", str(e))  # Esto te lo mostrará en consola
         return jsonify({
             "error": "Error en el servidor al registrar usuario.",
             "detalle": str(e)
         }), 500
+
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
