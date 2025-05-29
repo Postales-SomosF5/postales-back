@@ -9,7 +9,7 @@ from app.routes.interes_routes import intereses_bp
 from app.routes.emparejamiento_routes import emparejamientos_bp
 from app.routes.roles_routes import rol_bp
 
-from .extensions import db, bcrypt 
+from .extensions import db, bcrypt, mail
 import os
 from flask_jwt_extended import JWTManager
 from config import JWT_CONFIG, SECURITY_HEADERS
