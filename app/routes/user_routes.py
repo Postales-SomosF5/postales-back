@@ -93,7 +93,7 @@ def delete_user(user_id):
     db.session.commit()
     return jsonify({"mensaje": "Usuario eliminado correctamente"}), 200
 
-# DELETE /api/usuarios/borrar_todo - Eliminar un usuario
+# DELETE /api/usuarios/borrar_todo - Eliminar todos los usuarios
 @user_bp.route('/borrar_todo', methods=['DELETE'])
 @super_admin_required
 def borrar_todo():
