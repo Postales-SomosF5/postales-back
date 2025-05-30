@@ -54,7 +54,6 @@ class Usuario(db.Model):
             "email": self.email,
             "intereses": [interes.to_dict() for interes in self.intereses]
         }
->>>>>>> a37d1da (cerebro frito)
 
     def set_password(self, contrasena):
         self.contrasena = bcrypt.generate_password_hash(contrasena).decode('utf-8')
