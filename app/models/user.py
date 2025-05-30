@@ -36,7 +36,6 @@ class Usuario(db.Model):
             "intereses": [interes.to_dict() for interes in self.intereses]
         }
 
-
  # Relaciones
     centro = db.relationship('Centro', backref='usuarios')
     sector = db.relationship('Sector', backref='usuarios')
