@@ -1,28 +1,18 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-import os
+import pymysql
 from dotenv import load_dotenv
+import os
 
-load_dotenv()  # Carga las variables de entorno desde .env
+load_dotenv()
 
-app = Flask(__name__)
-
-# Configura la URI de la base de datos
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
-
-# Define un modelo simple para prueba
-class TestUser(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-
-# Ejecuta una prueba para crear la tabla
-with app.app_context():
-    try:
-        db.create_all()
-        print("✅ Conexión exitosa y tabla creada correctamente.")
-    except Exception as e:
-        print("❌ Error al conectar o crear tabla:")
-        print(e)
+try:
+    conn = pymysql.connect(
+        host=os.getenv('MYSQL_HOST', '127.0.0.1'),
+        port=int(os.getenv('MYSQL_PORT', 3306)),
+        user=os.getenv('MYSQL_USER', 'root'),
+        password=os.getenv('MYSQL_PASSWORD', '1234'),  # ¡vacío!
+        database=os.getenv('MYSQL_DB', 'postales')
+    )
+    print("✅ ¡Conexión exitosa a MySQL!")
+    conn.close()
+except Exception as e:
+    print("❌ Error:", e)
